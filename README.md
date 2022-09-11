@@ -17,6 +17,27 @@ Pythonの学習用
         （C#の `@"hoge"` とは仕様が異なるので注意。この辺PythonはWindowsではいまいち感ある）  
         ![](img/README/20220911-09152040.png)
 
+* 配列とリストの違い
+    * 配列は固定長で定義時の型のみ
+    * リストは動的配列で型はなんでも良い
+        * C#のSystem.Collections.Generic.List<System.Object>型が近いかも
+    * 両者はメモリ確保の仕方が違う
+
+* メモリ、ヒープ、スタック周り関連
+    * 整数はオブジェクトらしい・・・
+    * 値はCの実装依存らしい  
+    https://docs.python.org/ja/3/library/array.html  
+        > 値の実際の表現はマシンアーキテクチャ (厳密に言うとCの実装) によって決まります。値の実際のサイズは itemsize 属性から得られます。
+
+* 用語
+    * Python: 言語仕様
+    * CPython: Pythonの一実装（C言語で実装）
+    * IPython: Pythonの非常に強力な対話型シェル
+
+* pythonのソースコードのリポジトリ
+    * どこにあるのかよくわからないが、ここでダウンロードはできる  
+        https://www.python.org/downloads/source/
+    * とりあえず中身見るとC言語
 
 ## 機械学習関連
 
