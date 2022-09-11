@@ -28,6 +28,12 @@ Pythonの学習用
     * 値の表現はCの実装依存らしい  
     https://docs.python.org/ja/3/library/array.html  
         > 値の実際の表現はマシンアーキテクチャ (厳密に言うとCの実装) によって決まります。値の実際のサイズは itemsize 属性から得られます。
+    * 公式のドキュメント  
+    https://docs.python.org/ja/3/c-api/memory.html
+    * これ詳しい
+        * https://rushter.com/blog/python-garbage-collector/
+        * CPythonは参照カウンタ方式で世代別GCを実装しているようだ。整数がオブジェクト云々も書かれてる  
+    
 
 * 用語
     * Python: 言語仕様
