@@ -103,7 +103,7 @@ score()、accuracy_score()等で精度を取得可能。
             * 良いモデルはFPRが低い時点でTPRが高いらしい
         * scikit-learn.roc_curve()
         * このサイトがわかりやすい
-            * https://blog.kikagaku.co.jp/roc-auc ⇒ [キャプ画像](img/README/20220921-10030723.png)
+            * https://blog.kikagaku.co.jp/roc-auc
     * AUC
         * ROC曲線の下側の面積
         * 理想的なモデルは1になり、完全にランダムに予測だと0.5、正解と真逆の予測だと0
