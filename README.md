@@ -128,9 +128,249 @@ score()、accuracy_score()等で精度を取得可能。
 
 * scikit-learn feature_importances_プロパティ
     * 決定木系のアルゴリズムを選択したとき、特徴量（説明変数）の重要度を算出
+* XGB feature_importances_プロパティ
+    * scikit-learn同様？たぶん
+* XGB plot_importance()
+    * グラフ表示までまとめてやってくれる
+    * importance_type引数で重要度算出アルゴリズムを変更可能 weight or gain or cover
+        * gainオプションはfeature_importances_プロパティ同様になる
+    * 公式リファレンス: https://xgboost.readthedocs.io/en/stable/python/python_api.html
+        * > ”weight” is the number of times a feature appears in a tree  
+        * > ”gain” is the average gain of splits which use the feature  
+        * >”cover” is the average coverage of splits which use the feature where coverage is defined as the number of samples affected by the split
+
+### データの事前整形
+
+* データクリーニング（全角数字を半角数字に統一させたりとか）
+    * 不要な列の削除（IDなど）
+    * 定義外な値の見直し
+* データ統合（複数のデータを扱いやすく統合したりする）
+* データ変換（文字列を数値に変換したりする）
+* 特徴量エンジニアリング（説明変数を加工して新しい説明変数を作ったりなど）
+    * 一般的に、説明変数を増やすと精度向上しやすくなる＆過学習しやすくなる
+* ...など
+
+### EDA
+
+https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
+
+#### pandas ProfileReport()
+
+to_file()でhtmlファイルに出力可能。  
+ファイルサイズが大きい場合、Chrome系ブラウザだと out of meomry を起こすことがあるので、その場合はFirefoxで試してみる。
+
+#### seaborn
+
+* countplot
+* heatmap
+* pairplot
+
+#### one hot encoding
+
+* pandas get_dummies()
+    * drop_first = Trueにすると、生成される列が一つ減る
+* scikit-learn OneHotEncoder()
+
+### 次元削減、次元圧縮
+
+* スケール変換
+    * 機械学習時、データの分布が異なるデータを扱うときはほぼ必須
+        * Scikit-learn StandardScaler().fit_transform() ※他にもいくつかのスケール変換方法あり
+        * https://helve-blog.com/posts/python/scikit-learn-feature-scaling/
+* scikit-learn PCA() fit_transform()
+    * PCAはあらかじめスケール変換することが多い
+* scikit-learn TSNE() fit_transform()
+* 可視化は、二次元 or 三次元
+
+### パラメータチューニング
+
+パラメータチューニングは序盤から行うのはあまり適切でない。
+
+パラメータチューニングやる前に、特徴量エンジニアリングなどを行うのが精度改善につながりやすい。
+
+* ランダムフォレスト
+    * 以下はほぼ必須っぽい
+        * max_depath
+            * 深すぎても過学習してしまう（7くらいがよいらしい）
+            * scikit-learnのデフォルト値はNONE = 無限
+        * n_estimators
+    * 各パラメータ詳細: https://data-science.gr.jp/implementation/iml_sklearn_random_forest.html
+
+* XGB
+    * 以下は重要
+        * max_depath
+    * early_stopping
+        * 早めに打ち切ることで過学習を防ぐといったテクニックがある
+
+* scikit-learn GridSearchCV()
+    * param_grid: 探索対象ハイパーパラメータの辞書・リスト
+    * scoring: 評価指標（デフォルト値はaccuracy。必要に応じてf1など適切なものを選択）
+    * CV: 交差検証の回数
+    * best_estimator_プロパティで、成績の良かったパラメータを取得できる
+
+自動化
+
+* ハイパーパラメータの探索＆特徴量エンジニアリング  https://qiita.com/Hironsan/items/30fe09c85da8a28ebd63
 
 ### その他
 
 * Numpy便利関数
     * argsort(): 引数で指定した配列をソートした際の、元の配列のインデックス位置を返す
     * NumPy.ndarrayオブジェクトのインデクサの添字で、NumPy.ndarray型を渡せる
+    * NumPy.cut(), qcut()でビニング処理が可能  
+    前処理で使用することはわりとあるらしい
+
+* XGBoost
+    * early_stopping_round
+        * 1.6.0以降は、XGBClassfierなどのコンストラクタで指定するかset_paramsで指定する
+
+* グラフ表示
+    * Matplotlibの軸の指数表記の設定
+        * https://grapebanana.com/matplotlib-axis-11306/
+        * http://www.yamamo10.jp/yamamoto/comp/Python/library/Matplotlib/basic/setting/index.php#INIT-SET
+
+## パッケージ
+
+* インストールされるフォルダ
+    * `.\lib\site-packages` っぽい？
+* 一括アップデート
+    * `conda update --all`
+
+* pipコマンドを使う場合
+    * 常にこれを実行しておくのがよいらしい？ `python -m pip install --upgrade pip setuptools`
+* condaのアップデート
+    * `conda update -n base conda`
+* pandas-profiling
+    * なぜか `conda install -c conda-forge pandas-profiling` だと1.4.1系
+    * `pip install pandas-profiling`
+* XGBoost
+    * https://xgboost.readthedocs.io/en/stable/install.html#python
+    * 2022/09時点 `conda install -c conda-forge py-xgboost` だと1.5.0になる
+        * `conda install -c conda-forge py-xgboost==1.6.2` だと `conda-forge/win-64::py-xgboost-1.6.2-cpu_py39ha538f94_0` になる  
+        cpu onlyバージョン・・・？
+            * ここ見ると linux-64 しか無い・・・  
+            https://anaconda.org/conda-forge/py-xgboost-gpu  
+            ![](img/README/20220925-10120197.png)
+    * pipだとGPUサポートバージョンが含まれている模様  
+    ![](img/README/20220925-10143196.png)
+
+## 文字コード関連
+
+### pyファイルの文字コード設定
+
+コード内で日本語文字列が出てくるのであれば、ファイルの文字コードをutf-8にするのがたぶん楽。  
+※BOMありにして良いのかはよくわからない
+
+コードの一行目で文字コードを明記する方法もある。ぐぐったら以下がよくまとまっていた。  
+https://qiita.com/KEINOS/items/6efc1147b917d7811b5b
+
+## ロギングフレームワーク
+
+デフォルト機能でロギング用のライブラリが整備されている。
+
+https://docs.python.org/ja/3/howto/logging.html
+
+https://docs.python.org/ja/3/howto/logging.html#configuring-logging
+
+* フォーマッタ、ハンドラ
+    * https://www.python.ambitious-engineer.com/archives/693
+    * https://www.tohoho-web.com/python/logging.html
+
+## リフレクション系
+
+* 変数名取得
+    * locals, globals
+
+## CUDA
+
+* XGBoostでのGPU使用
+    * CUDA Toolkitを入れる必要がある
+    * condaでインストールされるxgboostは1.5.0だが、GPU非サポート
+        ```
+        xgboost.core.XGBoostError: [09:12:50] c:\windows\temp\abs_557yfx631l\croots\recipe\xgboost-split_1659548953302\work\src\common\common.h:157: XGBoost version not compiled with GPU support.
+        ```
+    * GPUのベンチマーク
+        * Windowsのanaconda 3だと、`benchmark_tree.py`は入ってないっぽい
+        * XGBoostのGitHubリポジトリには入っているのでここから落とせる
+        * "Anaconda Prompt (anaconda3)" から以下実行すればよい
+            ```
+            python tests/benchmark/benchmark_tree.py --tree_method=gpu_hist
+            python tests/benchmark/benchmark_tree.py --tree_method=hist
+            ```
+    * XGBClassifier()がGPU使う設定だと遅い
+        * VisualStudio2022でのデバッグ実行でも、Anaconda Promptからの実行でも、実行時間変わらない
+            * `tree_method="gpu_hist"`だと12分くらいかかる処理が、`tree_method="hist"`だと2分くらいになる  
+            ・・・？？🤔
+        * benchmark_tree.py だと、GPUはCPUの半分以下の処理時間で高速
+        * 原因不明
+            * 相性？ https://teratail.com/questions/296378
+        * 自分でビルドする場合の備忘
+            * https://sekailab.com/wp/2018/06/29/installation-xgboost-to-winwdows10-gpu-support/
+            * https://xgboost.readthedocs.io/en/latest/build.html#building-on-windows
+* CUDA
+    * https://developer.nvidia.com/cuda-gpus
+        * 対応しているGPUは以下箇所で確認可能  
+        ![](img/README/20220924-20194027.png)
+        * オフライン環境用だとバイナリがでかい
+            * CUDA 11で2.5GBある
+        * network環境用のインストーラを使うのが吉
+            * 以下は「Disable Usage Collection」で問題ない気はする  
+            ![](img/README/20220924-20411184.png)
+    * 古いバージョンはこちら  https://developer.nvidia.com/cuda-toolkit-archive
+
+## AnacondaやめてMinicondaにしてみる
+
+機械学習前提＆Jupityer Notebook使える状態にしておきたい＆pip使いたいことがある、ってときcondaとpipの混在が微妙っぽいので、以下を参考にAnacondaをアンインストールしてMinicondaを入れ直す。
+
+* 参考
+    * https://qiita.com/kawada2017/items/626a80ed5bbfdc2576a5
+* Miniconda ダウンロードサイト
+    * https://docs.conda.io/en/latest/miniconda.html#windows-installers
+    * Python 3.9用を選択
+    * インストール後、以下で確認していく
+        * `conda -V`
+        * `python --version`
+        * `conda info`
+    * 初期設定直後の状態で以下実行し、結果をとりあえずGitHub（プライベートリポジトリ）に放り込んでおく
+        * `pip freeze > requirements.txt`
+        * `conda list -e > conda_requirements.txt`
+        * requirements.txtは他端末で同じ環境を用意したいときに使える（あまりうまくいかないこともあるみたいだが）
+
+次に仮想環境を作る。Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで構築する。
+
+* 各機能の比較
+    * https://zenn.dev/mook_jp/articles/1d915a0aef83a7  
+![](img/README/20220925-16003149.png)
+    * https://qiita.com/KRiver1/items/c1788e616b77a9bad4dd#pyenv-virtualenv%E3%82%92%E3%82%84%E3%82%81pipenv%E3%82%92%E4%BD%BF%E3%81%86
+
+構築手順は以下を参考にする。
+
+* https://zenn.dev/unemployed/articles/cc111706c3167c
+
+* 実施手順
+    1. `Anaconda Prompt (miniconda3)` を立ち上げる
+    1. `conda create -n DataScienceCompe2022_eLearning python` で仮想環境を作成
+        * condaをupdateしたほうがよいみたいなことを言われるが無視する  
+        * C:\Users\ユーザ名\.conda\envs\DataScienceCompe2022_eLearning のようにフォルダが作られる
+        * インストールするモジュールがずらずら表示されるが、base側の話なのかよくわからない
+            * 実行前後でbase側の `conda list` を比較したが特に差分なかったので、仮想環境側の話のようだ。
+    1. インストール後、`conda info -e` で作った仮想環境一覧が見れる
+    1. `conda activate 環境名` で仮想環境に入る（source activate 環境名は古い書き方っぽい）
+    1. `pip freeze` でインストール済みのパッケージ一覧を確認
+        * インストールされている内容がめちゃシンプル
+    1. `conda deactivate` で仮想環境を抜ける
+    1. `conda remove -n 環境名 --all` で環境を削除できる
+
+* 追加で入れるパッケージ
+    * `Anaconda Prompt (miniconda3)` を立ち上げる
+        * `pip install jupyter notebook`
+            * ネット見ると、`conda install notebook ipykernel` の手順も必要なように書かれているが、特にやらなくても jupyter notebook からpythonは動いている模様（過去にAnaconda入れていたからかもしれない）
+        * jupyterの起動は `jupyter notebook` のようにするとブラウザが立ち上がるところまで自動で動く
+        * さらに `pip install numpy pandas pandas-profiling seaborn sklearn xgboost` を実行
+
+* Visual Studio Community 2022での設定
+    * ソリューションエクスプローラで `Python環境` -> `環境を追加`  
+    ![](img/README/20220925-16254675.png)
+    * `環境を追加` -> `既存環境` で（baseでない）仮想環境のフォルダを設定すると勝手にVSに認識される  
+    ![](img/README/20220925-16265625.png)
+
