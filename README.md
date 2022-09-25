@@ -266,7 +266,7 @@ https://qiita.com/KEINOS/items/6efc1147b917d7811b5b
 
 ## ロギングフレームワーク
 
-デフォルト機能でロギング用のライブラリが整備されている。
+Python標準ライブラリ内でロギング用ライブラリが整備されている。
 
 https://docs.python.org/ja/3/howto/logging.html
 
@@ -280,6 +280,9 @@ https://docs.python.org/ja/3/howto/logging.html#configuring-logging
 
 * 変数名取得
     * locals, globals
+* 備忘
+    * https://qiita.com/icoxfog417/items/bf04966d4e9706eb9e04
+    * https://docs.python.org/ja/3/c-api/reflection.html
 
 ## CUDA
 
