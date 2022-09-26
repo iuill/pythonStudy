@@ -148,6 +148,24 @@ score()、accuracy_score()等で精度を取得可能。
 * データ変換（文字列を数値に変換したりする）
 * 特徴量エンジニアリング（説明変数を加工して新しい説明変数を作ったりなど）
     * 一般的に、説明変数を増やすと精度向上しやすくなる＆過学習しやすくなる
+    * データの偏りは正規分布の形が理想
+        * https://uribo.github.io/practical-ds/02/numeric.html  
+            > 具体的には線形回帰モデルでは、出力から得られる値の誤差が正規分布に従うことを仮定します。そのため正規分布とは異なる形状の分布をもつデータ、例えば離散値ではその仮定が成立しないことが可能性があります。この問題を解決するため、元のデータを正規分布に近似させるという特徴量エンジニアリングが有効になります。  
+            > 良い特徴量というのはデータの特徴を強く反映します。連続的な数値の二値化あるいは離散化により、モデルの精度を改善できる見込みがあります。また数値以外のテキストや画像データを数値化した際、さらなる特徴量エンジニアリングが必要になることがあります。つまり数値データの処理は特徴量エンジニアリングの中で最も基本的な技と言えます。  
+            > ～略～  
+            > スケール変換では変数のばらつきを元にする変換のために変換後の値でも分布は変わりません。しかし対数変換ではデータの分布が変化します。
+    * 対数化の手法
+        * https://omathin.com/100knock-61-62/
+            * 0は扱えないので一般的には1を追加してから対数化する
+            * 常用対数化: numpy.log10()
+                * ex: `df_sales_amount['amount_log10'] = np.log10(df_sales_amount['amount']+1)`
+            * 自然対数化: numpy.log()
+                * ex: `df_sales_amount['amount_loge'] = np.log(df_sales_amount['amount']+1)`
+    * 相関が高すぎる説明変数を減らしてみる
+    * 不均衡データの調整
+        * アップサンプリング
+        * ダウンサンプリング
+        * 損失関数の調整
 * ...など
 
 ### EDA
@@ -156,8 +174,22 @@ https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
 
 #### pandas ProfileReport()
 
-to_file()でhtmlファイルに出力可能。  
-ファイルサイズが大きい場合、Chrome系ブラウザだと out of meomry を起こすことがあるので、その場合はFirefoxで試してみる。
+* 解説
+    * https://datatechlog.com/how-to-use-pandas-profiling/
+* to_file()でhtmlファイルに出力可能。  
+    * ファイルサイズが大きい場合、Chrome系ブラウザだと out of meomry を起こすことがあるので、その場合はFirefoxで試してみる。
+* オプション
+    * 相関を出さない: 
+        ```
+        df.profile_report(
+            title="Report without correlations",
+            correlations=None,
+        )
+        ```
+    * オプション一覧
+        * https://pandas-profiling.ydata.ai/docs/master/pages/advanced_usage/available_settings.html
+    * correlationsの有無、explorativeの有無、いずれも対して実行時間かわらない気がするのと、生成されるHTMLファイルのサイズは対して違いがない
+        * サイズや速度が気になるときは `minimal=True` を設定するのが効果的な気がする
 
 #### seaborn
 
@@ -339,7 +371,8 @@ https://docs.python.org/ja/3/howto/logging.html#configuring-logging
         * `conda list -e > conda_requirements.txt`
         * requirements.txtは他端末で同じ環境を用意したいときに使える（あまりうまくいかないこともあるみたいだが）
 
-次に仮想環境を作る。Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで構築する。
+次に仮想環境を作る。  
+Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで構築する。
 
 * 各機能の比較
     * https://zenn.dev/mook_jp/articles/1d915a0aef83a7  
@@ -355,9 +388,9 @@ https://docs.python.org/ja/3/howto/logging.html#configuring-logging
     1. `conda create -n DataScienceCompe2022_eLearning python` で仮想環境を作成
         * condaをupdateしたほうがよいみたいなことを言われるが無視する  
         * C:\Users\ユーザ名\.conda\envs\DataScienceCompe2022_eLearning のようにフォルダが作られる
-        * インストールするモジュールがずらずら表示されるが、base側の話なのかよくわからない
+        * インストールするパッケージがずらずら表示されるが、base側の話なのかよくわからない
             * 実行前後でbase側の `conda list` を比較したが特に差分なかったので、仮想環境側の話のようだ。
-    1. インストール後、`conda info -e` で作った仮想環境一覧が見れる
+    1. 環境作成・パッケージインストール後、`conda info -e` で作った仮想環境一覧が見れる
     1. `conda activate 環境名` で仮想環境に入る（source activate 環境名は古い書き方っぽい）
     1. `pip freeze` でインストール済みのパッケージ一覧を確認
         * インストールされている内容がめちゃシンプル
@@ -365,11 +398,11 @@ https://docs.python.org/ja/3/howto/logging.html#configuring-logging
     1. `conda remove -n 環境名 --all` で環境を削除できる
 
 * 追加で入れるパッケージ
-    * `Anaconda Prompt (miniconda3)` を立ち上げる
-        * `pip install jupyter notebook`
-            * ネット見ると、`conda install notebook ipykernel` の手順も必要なように書かれているが、特にやらなくても jupyter notebook からpythonは動いている模様（過去にAnaconda入れていたからかもしれない）
+    1. `Anaconda Prompt (miniconda3)` を立ち上げる
+    1. `pip install jupyter notebook`
+        * ネット見ると、`conda install notebook ipykernel` の手順も必要なように書かれているが、特にやらなくても jupyter notebook からpythonは動いている模様（過去にAnaconda入れていたからかもしれない）
         * jupyterの起動は `jupyter notebook` のようにするとブラウザが立ち上がるところまで自動で動く
-        * さらに `pip install numpy pandas pandas-profiling seaborn sklearn xgboost` を実行
+    1. `pip install numpy pandas pandas-profiling seaborn sklearn xgboost` を実行
 
 * Visual Studio Community 2022での設定
     * ソリューションエクスプローラで `Python環境` -> `環境を追加`  
@@ -377,3 +410,14 @@ https://docs.python.org/ja/3/howto/logging.html#configuring-logging
     * `環境を追加` -> `既存環境` で（baseでない）仮想環境のフォルダを設定すると勝手にVSに認識される  
     ![](img/README/20220925-16265625.png)
 
+## Visual Studio Community 2022ノウハウ
+
+* グラフ化
+    * 適当なところでブレークポイントで止めた状態でイミディエイトウィンドウで `sns.histplot(x="BILL_AMT1", data=data, element='step')` のように実行するとその場でグラフ見れる  
+    ![](img/README/20220926-22404058.png)
+    * グラフのウィンドウを複数枚出したいときは以下のように一度plt.figure()を呼び出せばとりあえずできる（もっとカッコいいやり方がありそうな気はする）
+        ```
+        plt.figure()
+        sns.histplot(x="BILL_AMT1", data=data, element='step')
+        ```
+    
