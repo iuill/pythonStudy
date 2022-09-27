@@ -479,3 +479,5 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
             * 保存時にファイル末尾に改行を入れる
         * editor.renderControlCharacters
             * 制御文字表示
+        * Python: Language Server
+            * とりあえず Pylance を指定してみる
