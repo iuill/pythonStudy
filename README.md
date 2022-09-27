@@ -260,6 +260,22 @@ https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
     * Matplotlibの軸の指数表記の設定
         * https://grapebanana.com/matplotlib-axis-11306/
         * http://www.yamamo10.jp/yamamoto/comp/Python/library/Matplotlib/basic/setting/index.php#INIT-SET
+    * パターン: seaborn使用
+        ```
+        sns.histplot(x="BILL_AMT1", data=data, element='step')
+        ```
+    * パターン
+        ```
+        df.hist() #全カラム対象
+        plt.show()
+        ```
+    * パターン:
+        ```
+        data["カラム名"].hist() #特定カラム指定
+        plt.tight_layout() #グラフ同士が重ならないようにする
+        plt.show()
+        ```
+
 
 ## パッケージ
 
@@ -410,9 +426,20 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
     * `環境を追加` -> `既存環境` で（baseでない）仮想環境のフォルダを設定すると勝手にVSに認識される  
     ![](img/README/20220925-16265625.png)
 
+## ipynbのビューア
+
+* Visual Studio Community 2022 + 拡張機能Notebook Editor
+    * https://marketplace.visualstudio.com/items?itemName=MLNET.notebook
+    * まだプレビュー版なせいなのかわからないが動きが遅くて実用する気になれない
+* Visual Studio Code
+    * ブラウザで開くときと同様の感覚で使えるが、ダーク系のテーマだとグラフが見づらい・・・
+        * ipynbのときだけライト系で、がっつりコーディングするときはダーク系がいい
+        * ワークスペースで設定変えればいいのか？
+            * https://prius.cc/itya/20181218_vscode-workspace
+
 ## Visual Studio Community 2022ノウハウ
 
-* グラフ化
+* グラフ化、可視化
     * 適当なところでブレークポイントで止めた状態でイミディエイトウィンドウで `sns.histplot(x="BILL_AMT1", data=data, element='step')` のように実行するとその場でグラフ見れる  
     ![](img/README/20220926-22404058.png)
     * グラフのウィンドウを複数枚出したいときは以下のように一度plt.figure()を呼び出せばとりあえずできる（もっとカッコいいやり方がありそうな気はする）
@@ -420,4 +447,9 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
         plt.figure()
         sns.histplot(x="BILL_AMT1", data=data, element='step')
         ```
-    
+
+## Visual Studio Codeノウハウ
+
+* グラフ化、可視化
+    * 適当なところでブレークポイント置くパターン
+        * デバッグコンソールで`sns.histplot(x="BILL_AMT1", data=data, element='step')` のように実行するとその場でグラフ見れる
