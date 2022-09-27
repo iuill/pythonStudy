@@ -453,3 +453,29 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
 * グラフ化、可視化
     * 適当なところでブレークポイント置くパターン
         * デバッグコンソールで`sns.histplot(x="BILL_AMT1", data=data, element='step')` のように実行するとその場でグラフ見れる
+* 拡張機能
+    * Pylance
+        * https://forest.watch.impress.co.jp/docs/news/1324425.html
+        * 型チェックを有効化する
+            * デフォルトだと無効
+            * VS Codeの設定画面から `python.analysis.typeCheckingMode` をbasicもしくはstrictに設定
+    * IntelliCode
+        * AI支援インテリセンス
+        * Python, Java, TypeScript, JavaScript対応
+    * Python Indent
+        * インデント挿入
+    * autopep8: 保留
+        * コードフォーマッタ
+    * flake8: 保留
+        * lint
+    * todo tree
+        * todoリスト
+        * コード上で `#TODO foobar` と入れるとTODOsパネルに表示される
+    * Zenkaku: 保留
+        * 全角スペース表示
+* 設定
+    * コマンドパレットで以下設定
+        * files.insertFinalNewline
+            * 保存時にファイル末尾に改行を入れる
+        * editor.renderControlCharacters
+            * 制御文字表示
