@@ -12,6 +12,13 @@ Pythonの学習用
         * [wikipedia](https://ja.wikipedia.org/wiki/Python)見ると、他にもPython実装は複数ある模様
     * IPython: Pythonの非常に強力な対話型シェル
 
+* 関数定義
+    * https://note.nkmk.me/python-function-def-return/
+
+* 型ヒント
+    * https://qiita.com/icoxfog417/items/c17eb042f4735b7924a3
+    * https://docs.python.org/ja/3/library/typing.html
+
 * 内包表記
     * map(), filter()等で書くことも可能だが、速度面では内包表記が優れているらしい
 
@@ -46,6 +53,10 @@ Pythonの学習用
     * どこにあるのかよくわからないが、ここでダウンロードはできる  
         https://www.python.org/downloads/source/
     * とりあえず中身見るとC言語
+
+* docstring （C#のドキュメントコメント的な機能 / \<summary\>...\</summary\>的なの）
+    * https://maku77.github.io/python/env/docstring.html
+    * https://note.nkmk.me/python-docstring/
 
 ## 機械学習関連
 
@@ -157,10 +168,11 @@ score()、accuracy_score()等で精度を取得可能。
     * 対数化の手法
         * https://omathin.com/100knock-61-62/
             * 0は扱えないので一般的には1を追加してから対数化する
-            * 常用対数化: numpy.log10()
-                * ex: `df_sales_amount['amount_log10'] = np.log10(df_sales_amount['amount']+1)`
-            * 自然対数化: numpy.log()
-                * ex: `df_sales_amount['amount_loge'] = np.log(df_sales_amount['amount']+1)`
+                * 常用対数化: numpy.log10()
+                    * ex: `df_sales_amount['amount_log10'] = np.log10(df_sales_amount['amount']+1)`
+                * 自然対数化: numpy.log()
+                    * ex: `df_sales_amount['amount_loge'] = np.log(df_sales_amount['amount']+1)`
+            * 対数への変換では、基本的に自然対数を使用するらしい
     * 相関が高すぎる説明変数を減らしてみる
     * 不均衡データの調整
         * アップサンプリング
@@ -192,6 +204,8 @@ https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
         * サイズや速度が気になるときは `minimal=True` を設定するのが効果的な気がする
 
 #### seaborn
+
+seaborn: Matplotlibのラッパーライブラリ
 
 * countplot
 * heatmap
@@ -251,6 +265,10 @@ https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
     * NumPy.ndarrayオブジェクトのインデクサの添字で、NumPy.ndarray型を渡せる
     * NumPy.cut(), qcut()でビニング処理が可能  
     前処理で使用することはわりとあるらしい
+    * slice, loc, iloc, at, iat
+        * https://note.nkmk.me/python-pandas-at-iat-loc-iloc/
+    * 条件抽出の手法
+        * https://note.nkmk.me/python-pandas-query/
 
 * XGBoost
     * early_stopping_round
@@ -481,3 +499,6 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
             * 制御文字表示
         * Python: Language Server
             * とりあえず Pylance を指定してみる
+        * Pylance / Python › Analysis: Auto Import Completions
+            * 意図しないimport文が挿入されることがあるの、これのせいかも
+            * OFFにしたい気がする
