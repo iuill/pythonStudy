@@ -491,6 +491,10 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
         * コード上で `#TODO foobar` と入れるとTODOsパネルに表示される
     * Zenkaku: 保留
         * 全角スペース表示
+    * autoDocstring - Python Docstring Generator
+        * docstring
+        * dostring formatはとりあえずgoogleスタイルで
+        * ctrl + shift + 2 で自動挿入される
 * 設定
     * コマンドパレットで以下設定
         * files.insertFinalNewline
@@ -502,3 +506,6 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
         * Pylance / Python › Analysis: Auto Import Completions
             * 意図しないimport文が挿入されることがあるの、これのせいかも
             * OFFにしたい気がする
+* インテリセンス系
+    * 関数情報等: `ctrl + i` or `ctrl + k -> ctrl + i`
+    * `ctrl + k -> ctrl + i` の方がシグニチャ情報などが見やすいしたぶん全部見れてる
