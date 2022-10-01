@@ -14,6 +14,7 @@ Pythonの学習用
 
 * 関数定義
     * https://note.nkmk.me/python-function-def-return/
+    * プロパティのsetter/getterはめんどくさい（C#比）
 
 * 型ヒント
     * https://qiita.com/icoxfog417/items/c17eb042f4735b7924a3
@@ -21,6 +22,10 @@ Pythonの学習用
 
 * 内包表記
     * map(), filter()等で書くことも可能だが、速度面では内包表記が優れているらしい
+
+* インクリメント/デクリメント
+    * 対応していない
+    * https://www.deep-rain.com/programming/python/1772
 
 * 文字列
     * フォルダパスを書く際は、raw文字列で書くのがとりあえずは楽か
@@ -35,6 +40,11 @@ Pythonの学習用
     * リストは動的配列で型はなんでも良い
         * C#のSystem.Collections.Generic.List<System.Object>型が近いかも
     * 両者はメモリ確保の仕方が違う
+
+* 変数代入の挙動
+    * https://www.learning-nao.com/?p=2384
+        * =での代入は参照渡し
+        * df.copy()でディープコピー
 
 * メモリ、ヒープ、スタック周り関連
     * 整数はオブジェクトらしい・・・
@@ -175,14 +185,47 @@ score()、accuracy_score()等で精度を取得可能。
             * 対数への変換では、基本的に自然対数を使用するらしい
     * 相関が高すぎる説明変数を減らしてみる
     * 不均衡データの調整
-        * アップサンプリング
+        * 不均衡データとは
+            * https://atmarkit.itmedia.co.jp/ait/articles/2208/31/news039.html
+                * > 一般化された明確な基準はないが、二値分類であれば少数派クラスが以下のような感覚
+                    > * 1％未満＝重度の不均衡データ
+                    > * 1％以上～20％未満＝中度の不均衡データ
+                    > * 21％以上～40％未満＝軽度の不均衡データ
+                * 用語
+                    > * アンダーサンプリング（Undersampling）： 多数派クラスを少数派クラスの数と同じくらいまで（もしくは不均衡が弱まるまで）減らすこと。ダウンサンプリング（Downsampling）とも呼ぶ
+                    > * オーバーサンプリング（Oversampling）： 少数派クラスを多数派クラスの数と同じくらいまで（もしくは不均衡が弱まるまで）増やすこと。アップサンプリング（Upsampling）とも呼ぶ
+        * アップサンプリング / オーバーサンプリング
+            * https://qiita.com/eigs/items/9ed36b5fc2913110e940
+            * https://qiita.com/eigs/items/8ae0970afe188a1124d1
+            * https://qiita.com/tempester08/items/d84ce8d423919a0e5239
+                * SMOTEやる前に、テストデータは分離しておくようにという話
+                    * 特徴量エンジニアリングやるとき、学習データとテストデータ両方にやらないとカラム構成が変わると思うんだけど、なにか楽なやり方あるのかな・・・
         * ダウンサンプリング
         * 損失関数の調整
+            * class_weight
+                * https://www.haya-programming.com/entry/2018/05/17/123000
 * ...など
 
 ### EDA
 
-https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
+* まずやるべきこと
+    * https://qiita.com/takubb/items/e18ea4f7c4ecc8be4a5f
+* https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
+
+#### pandas DataFrame
+
+* 欠損値確認
+    * `df.isnull().sum()`
+* 要約統計量
+    * `df.describe()`
+    * `Kaggleのチュートリアル第6版`だと、trainとtest(←目的変数が入ってない)を縦に連結した状態で見ていた
+        * 縦の連結: `pd.concat([train, test], axis=0, sort=False)`
+    * describe()の引数
+        * https://note.nkmk.me/python-pandas-describe/
+        * percentiles: 任意の分位点指定可能
+        * include: "all"を指定するとすべての型が見れる。"O"だとオブジェクト型
+        * 公式: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.describe.html  
+        ![](img/README/20221001-17014006.png)
 
 #### pandas ProfileReport()
 
@@ -202,6 +245,13 @@ https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
         * https://pandas-profiling.ydata.ai/docs/master/pages/advanced_usage/available_settings.html
     * correlationsの有無、explorativeの有無、いずれも対して実行時間かわらない気がするのと、生成されるHTMLファイルのサイズは対して違いがない
         * サイズや速度が気になるときは `minimal=True` を設定するのが効果的な気がする
+    * Overview - Alertsの意味
+        * High cardinality: データの総数に比してデータの種類が多い
+        * High correlation: ある列との相関が高い
+        * Missing: 欠損値が多い
+        * Uniform
+        * Unique
+        * Zeros
 
 #### seaborn
 
@@ -293,6 +343,9 @@ seaborn: Matplotlibのラッパーライブラリ
         plt.tight_layout() #グラフ同士が重ならないようにする
         plt.show()
         ```
+    * bins、階級数
+        * スタージェスの公式
+            * https://tanuhack.com/seaborn-histgram/
 
 
 ## パッケージ
@@ -304,6 +357,10 @@ seaborn: Matplotlibのラッパーライブラリ
 
 * pipコマンドを使う場合
     * 常にこれを実行しておくのがよいらしい？ `python -m pip install --upgrade pip setuptools`
+    * 一括アップデート
+        * Linuxだとシェルでごにょごにょだが、Windowsのcmdだとめんどくさい
+        * pip-reviewというパッケージ入れると楽になれるらしい
+            * https://zenn.dev/kittybbit/articles/bf8dd1db0e307d
 * condaのアップデート
     * `conda update -n base conda`
 * pandas-profiling
@@ -341,6 +398,13 @@ https://docs.python.org/ja/3/howto/logging.html#configuring-logging
 * フォーマッタ、ハンドラ
     * https://www.python.ambitious-engineer.com/archives/693
     * https://www.tohoho-web.com/python/logging.html
+
+## アプリケーション設定
+
+py, ini, jsonのパターンが多そう。
+iniはConfigParserで処理できる。
+* https://kodocode.net/python-begin-settings/
+
 
 ## リフレクション系
 
@@ -437,6 +501,9 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
         * ネット見ると、`conda install notebook ipykernel` の手順も必要なように書かれているが、特にやらなくても jupyter notebook からpythonは動いている模様（過去にAnaconda入れていたからかもしれない）
         * jupyterの起動は `jupyter notebook` のようにするとブラウザが立ち上がるところまで自動で動く
     1. `pip install numpy pandas pandas-profiling seaborn sklearn xgboost` を実行
+    1. `pip install -U imbalanced-learn`
+        * SMOTE
+    1. `pip install -U plotly`
 
 * Visual Studio Community 2022での設定
     * ソリューションエクスプローラで `Python環境` -> `環境を追加`  
@@ -472,6 +539,9 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
     * 適当なところでブレークポイント置くパターン
         * デバッグコンソールで`sns.histplot(x="BILL_AMT1", data=data, element='step')` のように実行するとその場でグラフ見れる
 * 拡張機能
+    * indent-rainbow
+        * インデント階層の可視化
+        * デフォルトよりは見やすくなるので無いよりはあったほうが良い
     * Pylance
         * https://forest.watch.impress.co.jp/docs/news/1324425.html
         * 型チェックを有効化する
@@ -495,6 +565,9 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
         * docstring
         * dostring formatはとりあえずgoogleスタイルで
         * ctrl + shift + 2 で自動挿入される
+    * python-snippets
+        * https://marketplace.visualstudio.com/items?itemName=frhtylcn.pythonsnippets
+        * とりあえずスニペットないとめんどくさいので適当なものを入れてみる
 * 設定
     * コマンドパレットで以下設定
         * files.insertFinalNewline
@@ -509,3 +582,9 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
 * インテリセンス系
     * 関数情報等: `ctrl + i` or `ctrl + k -> ctrl + i`
     * `ctrl + k -> ctrl + i` の方がシグニチャ情報などが見やすいしたぶん全部見れてる
+    * `ctrl + space` は本家Visual Studioと同じ
+
+## 気になっている書籍
+
+* O’Reilly: ゼロから作るDeep Learning
+* [第3版]Python機械学習プログラミング 達人データサイエンティストによる理論と実践
