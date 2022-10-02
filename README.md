@@ -210,6 +210,8 @@ score()、accuracy_score()等で精度を取得可能。
 
 * まずやるべきこと
     * https://qiita.com/takubb/items/e18ea4f7c4ecc8be4a5f
+    * trainとtestのデータは縦に連結した上でEDAした方がよいかも
+        * trainだけ見ていても結局testの方も気になってしまって作業の無駄感ある
 * https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
 
 #### pandas DataFrame
@@ -226,6 +228,24 @@ score()、accuracy_score()等で精度を取得可能。
         * include: "all"を指定するとすべての型が見れる。"O"だとオブジェクト型
         * 公式: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.describe.html  
         ![](img/README/20221001-17014006.png)
+* 部分一致
+    * 正規表現そのまま使える
+        * デフォルトで大文字小文字区別してるっぽい
+        * df.str.contains('[a-z]+')
+        * df.str.match()もある
+        * 機能見る限りエンジンの実装は.NETと同じ系統くさい
+            * 書いてあった https://learn.microsoft.com/ja-jp/dotnet/standard/base-types/details-of-regular-expression-behavior
+* 複数の値（リスト）でまとめて絞る
+    * int型の列に対して `df.str.match("^[0123]$")` みたいにやると `Can only use .str accessor with string values!` と怒られてしまう。。
+        * こういうときは `df.isin([0, 1, 2])` みたいにやればおｋ
+* エラー  
+    ```
+    A value is trying to be set on a copy of a slice from a DataFrame.
+    Try using .loc[row_indexer,col_indexer] = value instead
+    ```
+    * https://qiita.com/FukuharaYohei/items/b3aa7113d08858676910
+    * チェーンでつなげると発生しやすくなる模様
+    * 対処法は .loc[] 使う
 
 #### pandas ProfileReport()
 
@@ -278,11 +298,38 @@ seaborn: Matplotlibのラッパーライブラリ
 * scikit-learn TSNE() fit_transform()
 * 可視化は、二次元 or 三次元
 
+### 学習モデル
+
+* 勾配ブースティング決定木系（GBDT）
+    * 全般基礎知識
+        * https://qiita.com/kuroitu/items/57425380546f7b9ed91c
+        * https://www.acceluniverse.com/blog/developers/2019/12/gbdt.html
+    * 特徴
+        * https://doctorsato.com/python_gbdt/
+            * 欠損値を扱うことができる
+            * パラメータチューニングをしなくとも精度がでやすい
+            * 不要な特徴量を追加しても精度が落ちにくい
+    * LightGBM
+        * https://lightgbm.readthedocs.io/
+        * XGBoost同様、勾配ブースティング
+        * 予測精度を保ったまま処理時間が高速されている（しかもCPUで）
+            * https://rightcode.co.jp/blog/information-technology/lightgbm-useful-for-kaggler
+            * 深さ優先探索っぽい感じ
+            * LightGBMは、専用のデータセットに入れることで処理速度が上がるそう
+        * GPU使う場合はaptコマンド・・・？（pipじゃない？）
+            * 公式チュートリアル https://lightgbm.readthedocs.io/en/latest/GPU-Tutorial.html
+    * XGBoost
+    * Catboost
+        * GPU使うならLightGBMより簡単ぽい
+        * https://qiita.com/tanreinama/items/5e3eca5cf5e01169e5da
+
 ### パラメータチューニング
 
 パラメータチューニングは序盤から行うのはあまり適切でない。
 
 パラメータチューニングやる前に、特徴量エンジニアリングなどを行うのが精度改善につながりやすい。
+
+ブースティング系は、ハイパーパラメータの調整による精度向上分は小さいと言われおり、特徴量エンジニアリングが有効らしい。
 
 * ランダムフォレスト
     * 以下はほぼ必須っぽい
@@ -307,6 +354,7 @@ seaborn: Matplotlibのラッパーライブラリ
 自動化
 
 * ハイパーパラメータの探索＆特徴量エンジニアリング  https://qiita.com/Hironsan/items/30fe09c85da8a28ebd63
+
 
 ### その他
 
@@ -376,6 +424,7 @@ seaborn: Matplotlibのラッパーライブラリ
             ![](img/README/20220925-10120197.png)
     * pipだとGPUサポートバージョンが含まれている模様  
     ![](img/README/20220925-10143196.png)
+
 
 ## 文字コード関連
 
@@ -504,6 +553,7 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
     1. `pip install -U imbalanced-learn`
         * SMOTE
     1. `pip install -U plotly`
+    1. `pip install -U lightgbm`
 
 * Visual Studio Community 2022での設定
     * ソリューションエクスプローラで `Python環境` -> `環境を追加`  
