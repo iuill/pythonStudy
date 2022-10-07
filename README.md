@@ -70,7 +70,34 @@ Pythonの学習用
 
 ## 機械学習関連
 
-一般的な流れ
+一般的な流れ（コンペ想定）
+
+* データの内容を確認
+    * 各項目の意味
+    * 欠損値の有無
+    * 連続データ、カテゴリ値など
+    * ...など
+* EDA
+    * データを解析可能な状態に変換する
+        * pandasやseaborn用に文字列のカテゴリデータを数値に変換するなども必要
+    * 様々な切り口でデータを見る
+        * カテゴリデータ
+            * ヒストグラムなど
+        * 連続データ、離散データ
+            * 散布図など
+    * 特徴を新規に作って目的変数との相関を見る
+    * ...など
+* 学習
+    * ハイパーパラメータ調整
+        * GridSearchCV
+        * Outuna
+    * 汎化性能確認
+        * k分割交差検証
+        * 層化k分割交差検証
+    * ...など
+* Submit
+    * submit用のデータを作って投稿
+
 
 ### 学習データ、検証データの作成
 
@@ -160,11 +187,18 @@ score()、accuracy_score()等で精度を取得可能。
         * > ”gain” is the average gain of splits which use the feature  
         * >”cover” is the average coverage of splits which use the feature where coverage is defined as the number of samples affected by the split
 
+* 参考: 学習曲線、適合率-再現率、ROC曲線などのグラフを一括で出す
+    * https://clover.fcg.world/2016/03/28/2939/
+
 ### データの事前整形
 
-* データクリーニング（全角数字を半角数字に統一させたりとか）
+* データクリーニング
+    * フォーマットの統一（全角、半角とか）
     * 不要な列の削除（IDなど）
     * 定義外な値の見直し
+    * 欠損値の補完
+        * https://qiita.com/FukuharaYohei/items/9830d5760595619352a5
+        * 欠損値の補完は良し悪し（やらないという選択肢もある）
 * データ統合（複数のデータを扱いやすく統合したりする）
 * データ変換（文字列を数値に変換したりする）
 * 特徴量エンジニアリング（説明変数を加工して新しい説明変数を作ったりなど）
@@ -213,6 +247,13 @@ score()、accuracy_score()等で精度を取得可能。
     * trainとtestのデータは縦に連結した上でEDAした方がよいかも
         * trainだけ見ていても結局testの方も気になってしまって作業の無駄感ある
 * https://qiita.com/ryo111/items/bf24c8cf508ad90cfe2e
+* Titanic
+    * 思ってなかった観点で見てる人がいたりする
+        * https://qiita.com/jun40vn/items/d8a1f71fae680589e05c
+    * 初心者がKaggle Titanicで上位1.5%(0.83732)以内に入るアプローチ解説
+        * https://qiita.com/shiroino11111/items/bc3889fa38ff32d46c13
+        * https://qiita.com/shiroino11111/items/fb6aa6b7dba2ddc3ce04
+        * https://qiita.com/shiroino11111/items/21bf1303587eeae0fc30
 
 #### pandas DataFrame
 
@@ -246,6 +287,9 @@ score()、accuracy_score()等で精度を取得可能。
     * https://qiita.com/FukuharaYohei/items/b3aa7113d08858676910
     * チェーンでつなげると発生しやすくなる模様
     * 対処法は .loc[] 使う
+* pandas重いとき
+    * numpyでも似たようなことはできる模様
+        * https://qiita.com/nkay/items/6778bb6a6400ed985aa0
 
 #### pandas ProfileReport()
 
@@ -263,7 +307,7 @@ score()、accuracy_score()等で精度を取得可能。
         ```
     * オプション一覧
         * https://pandas-profiling.ydata.ai/docs/master/pages/advanced_usage/available_settings.html
-    * correlationsの有無、explorativeの有無、いずれも対して実行時間かわらない気がするのと、生成されるHTMLファイルのサイズは対して違いがない
+    * correlationsの有無、explorativeの有無、いずれも大して実行時間かわらない気がするのと、生成されるHTMLファイルのサイズは対して違いがない
         * サイズや速度が気になるときは `minimal=True` を設定するのが効果的な気がする
     * Overview - Alertsの意味
         * High cardinality: データの総数に比してデータの種類が多い
@@ -281,10 +325,12 @@ seaborn: Matplotlibのラッパーライブラリ
 * heatmap
 * pairplot
 
-#### one hot encoding
+#### one-hot-encoding
 
 * pandas get_dummies()
     * drop_first = Trueにすると、生成される列が一つ減る
+    * マルチコ(multicollinearity)
+        * https://clover.fcg.world/2016/03/28/2939/
 * scikit-learn OneHotEncoder()
 
 ### 次元削減、次元圧縮
@@ -293,6 +339,9 @@ seaborn: Matplotlibのラッパーライブラリ
     * 機械学習時、データの分布が異なるデータを扱うときはほぼ必須
         * Scikit-learn StandardScaler().fit_transform() ※他にもいくつかのスケール変換方法あり
         * https://helve-blog.com/posts/python/scikit-learn-feature-scaling/
+    * 重要
+        * スケール変換はtrain, testデータを別々にやってはいけない
+        * 分散、平均、最大値、最小値などの情報は、train, testデータともに同じ状態にすることが重要
 * scikit-learn PCA() fit_transform()
     * PCAはあらかじめスケール変換することが多い
 * scikit-learn TSNE() fit_transform()
@@ -304,6 +353,7 @@ seaborn: Matplotlibのラッパーライブラリ
     * 全般基礎知識
         * https://qiita.com/kuroitu/items/57425380546f7b9ed91c
         * https://www.acceluniverse.com/blog/developers/2019/12/gbdt.html
+        * https://www.youtube.com/watch?v=u0IIqeNZOXY
     * 特徴
         * https://doctorsato.com/python_gbdt/
             * 欠損値を扱うことができる
@@ -318,9 +368,16 @@ seaborn: Matplotlibのラッパーライブラリ
             * LightGBMは、専用のデータセットに入れることで処理速度が上がるそう
         * GPU使う場合はaptコマンド・・・？（pipじゃない？）
             * 公式チュートリアル https://lightgbm.readthedocs.io/en/latest/GPU-Tutorial.html
+        * パラメータチューニング
+            * https://qiita.com/c60evaporator/items/351188110f328ff921b9
     * XGBoost
+        * 以下は重要
+            * max_depath
+        * early_stopping
+            * 早めに打ち切ることで過学習を防ぐ
     * Catboost
-        * GPU使うならLightGBMより簡単ぽい
+        * カテゴリカル変数の扱いに強みあるが、実務やコンペではあまり使われていない模様？
+        * GPU使うならLightGBMより簡単に導入できるっぽい？
         * https://qiita.com/tanreinama/items/5e3eca5cf5e01169e5da
 
 ### パラメータチューニング
@@ -338,18 +395,15 @@ seaborn: Matplotlibのラッパーライブラリ
             * scikit-learnのデフォルト値はNONE = 無限
         * n_estimators
     * 各パラメータ詳細: https://data-science.gr.jp/implementation/iml_sklearn_random_forest.html
-
-* XGB
-    * 以下は重要
-        * max_depath
-    * early_stopping
-        * 早めに打ち切ることで過学習を防ぐといったテクニックがある
-
 * scikit-learn GridSearchCV()
     * param_grid: 探索対象ハイパーパラメータの辞書・リスト
     * scoring: 評価指標（デフォルト値はaccuracy。必要に応じてf1など適切なものを選択）
     * CV: 交差検証の回数
     * best_estimator_プロパティで、成績の良かったパラメータを取得できる
+* 特徴量の取捨選択
+    * https://qiita.com/Qwertyutr/items/9a02d2416bd8f3fae860
+        > * 統計的な側面で特徴量選択→ SeletKBest（など。他にもあります）
+        > * 機械学習の側面で特徴量選択→RFE（など。ほかにもあります）
 
 自動化
 
@@ -395,7 +449,6 @@ seaborn: Matplotlibのラッパーライブラリ
         * スタージェスの公式
             * https://tanuhack.com/seaborn-histgram/
 
-
 ## パッケージ
 
 * インストールされるフォルダ
@@ -425,6 +478,14 @@ seaborn: Matplotlibのラッパーライブラリ
     * pipだとGPUサポートバージョンが含まれている模様  
     ![](img/README/20220925-10143196.png)
 
+## バージョン管理
+
+* 実験結果の管理、整理
+    * Weights & Biases (wandb) がよいらしい？
+        * 個人なら無料
+
+* コードのバージョン管理
+    * GitHub（普段使ってるので）
 
 ## 文字コード関連
 
@@ -448,6 +509,7 @@ https://docs.python.org/ja/3/howto/logging.html#configuring-logging
     * https://www.python.ambitious-engineer.com/archives/693
     * https://www.tohoho-web.com/python/logging.html
 
+
 ## アプリケーション設定
 
 py, ini, jsonのパターンが多そう。
@@ -462,6 +524,9 @@ iniはConfigParserで処理できる。
 * 備忘
     * https://qiita.com/icoxfog417/items/bf04966d4e9706eb9e04
     * https://docs.python.org/ja/3/c-api/reflection.html
+* スクリプトからインストールされているモジュールを確認
+    * https://qiita.com/pashango2/items/ef6c50dd0f91a63cf519
+
 
 ## CUDA
 
@@ -571,6 +636,8 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
         * ipynbのときだけライト系で、がっつりコーディングするときはダーク系がいい
         * ワークスペースで設定変えればいいのか？
             * https://prius.cc/itya/20181218_vscode-workspace
+    * *.pyで書いて、その後にipynbに変換する方法もある
+        * https://qiita.com/komiya_____/items/547ae8b5a9b031f18b59
 
 ## Visual Studio Community 2022ノウハウ
 
@@ -634,7 +701,28 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
     * `ctrl + k -> ctrl + i` の方がシグニチャ情報などが見やすいしたぶん全部見れてる
     * `ctrl + space` は本家Visual Studioと同じ
 
-## 気になっている書籍
+## あとで詳細読んでおきたいメモ
 
-* O’Reilly: ゼロから作るDeep Learning
-* [第3版]Python機械学習プログラミング 達人データサイエンティストによる理論と実践
+* Kaggleで書いたコードの備忘録
+    * https://qiita.com/pocokhc/items/add4948aa0ff858218f8
+    * https://qiita.com/pocokhc/items/0b6b6534ab984bb87ac4
+    * https://qiita.com/pocokhc/items/56273f40f57679f25341
+
+## 書籍
+
+* 気になっている
+    * O’Reilly: ゼロから作るDeep Learning
+    * [第3版]Python機械学習プログラミング 達人データサイエンティストによる理論と実践
+    * Kaggleで勝つデータ分析の技術
+        * https://github.com/ghmagazine/kagglebook
+
+* 読了
+    * Kaggleのチュートリアル第６版
+        * Titanicでkaggleへの初Submit、さらに学習の基本的な流れが参考になった
+        * https://www.currypurin.com/tutorial_ver6_support
+    * kaggleで上位に入るための探索的データ解析入門
+        * データの種類ごとの考慮点、箱ひげ図、バイオリン図のサンプルがよかった
+
+* あとで読み直す
+    * Pythonで動かして学ぶ！ あたらしい機械学習の教科書 第2版
+
