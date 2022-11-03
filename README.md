@@ -68,6 +68,11 @@ Pythonの学習用
     * https://maku77.github.io/python/env/docstring.html
     * https://note.nkmk.me/python-docstring/
 
+* 例外
+    * 例外が発生しない場合は、例外処理書くことのコストはそんなに気にしなくてよいっぽい
+        * https://ja.stackoverflow.com/questions/39712/python%E3%81%AE%E4%BE%8B%E5%A4%96%E5%87%A6%E7%90%86%E3%81%AF%E9%81%85%E3%81%8F%E3%81%AA%E3%81%84
+
+
 ## 機械学習関連
 
 一般的な流れ（コンペ想定）
@@ -139,7 +144,12 @@ predict()で検証データを使って予測の精度を測定する。
 
 score()、accuracy_score()等で精度を取得可能。
 
+CVはちゃんとやったほうがよい。（publicに最適化されすぎてprivateで不適合になる可能性あり）  
+逆にいうとpublicのスコアよりCVを信じた方がよい。
+
 * 分類
+    * 二値分類問題は評価指標にかかわらずloglossかaucを使うのが安定する
+        * Kaggleで勝つデータ分析の技術
     * Accuracy
     * f値
         * 分類問題ではこれを見ることが多い
@@ -333,6 +343,14 @@ seaborn: Matplotlibのラッパーライブラリ
         * https://clover.fcg.world/2016/03/28/2939/
 * scikit-learn OneHotEncoder()
 
+#### Xfeat
+
+* ml_metrics が setuptools v58 以降の環境で対応していないため、setuptoolsをダウングレードしておく必要がある
+    ```
+    $ pip install -U "setuptools<58"
+    $ pip install xfeat
+    ```
+
 ### 次元削減、次元圧縮
 
 * スケール変換
@@ -379,6 +397,21 @@ seaborn: Matplotlibのラッパーライブラリ
         * カテゴリカル変数の扱いに強みあるが、実務やコンペではあまり使われていない模様？
         * GPU使うならLightGBMより簡単に導入できるっぽい？
         * https://qiita.com/tanreinama/items/5e3eca5cf5e01169e5da
+
+* ニューラルネットワーク
+    * 比較
+        * https://www.tdi.co.jp/miso/tensorflow-keras-pytorch
+        * パフォーマンス優先なら Tensorflow or PyTorch
+        * 可読性優先なら Keras
+    * Tensorflow
+        * https://zenn.dev/mimitako/articles/kaggle_first
+    * Keras
+        * バックエンドに CNTK、Tensorflow、Theano などが使える
+    * PyTorch
+        * 主に自然言語処理用途
+
+* end-to-endとは
+    * https://speakerdeck.com/poya/mao-demowakarutabnet?slide=8
 
 ### パラメータチューニング
 
@@ -427,9 +460,17 @@ seaborn: Matplotlibのラッパーライブラリ
         * 1.6.0以降は、XGBClassfierなどのコンストラクタで指定するかset_paramsで指定する
 
 * グラフ表示
-    * Matplotlibの軸の指数表記の設定
-        * https://grapebanana.com/matplotlib-axis-11306/
-        * http://www.yamamo10.jp/yamamoto/comp/Python/library/Matplotlib/basic/setting/index.php#INIT-SET
+    * Matplotlib
+        * 軸の指数表記の設定
+            * https://grapebanana.com/matplotlib-axis-11306/
+            * http://www.yamamo10.jp/yamamoto/comp/Python/library/Matplotlib/basic/setting/index.php#INIT-SET
+        * 日本語対応
+            * https://gammasoft.jp/blog/matplotlib-japanese-fonts/
+        * 日本語対応 pandas ProfileReport()の場合
+            * import japanize_matplotlib はうまくいかなかった
+            * pandas_profiling.mplstyle を直に書き換えが必要っぽい
+                * https://qiita.com/yubiquita/items/9c056e175ccb085eb137
+
     * パターン: seaborn使用
         ```
         sns.histplot(x="BILL_AMT1", data=data, element='step')
@@ -448,6 +489,11 @@ seaborn: Matplotlibのラッパーライブラリ
     * bins、階級数
         * スタージェスの公式
             * https://tanuhack.com/seaborn-histgram/
+
+* optuna
+    * 乱数シードの固定方法
+        * create_study()時にsamplerでseedを固定する
+        * 目的変数が一次元のときはTPESampler、二次元以上のときはNSGAIISampler
 
 ## パッケージ
 
@@ -530,8 +576,8 @@ iniはConfigParserで処理できる。
 
 ## CUDA
 
+* CUDA Toolkitを入れる必要がある（後述）
 * XGBoostでのGPU使用
-    * CUDA Toolkitを入れる必要がある
     * condaでインストールされるxgboostは1.5.0だが、GPU非サポート
         ```
         xgboost.core.XGBoostError: [09:12:50] c:\windows\temp\abs_557yfx631l\croots\recipe\xgboost-split_1659548953302\work\src\common\common.h:157: XGBoost version not compiled with GPU support.
@@ -564,7 +610,11 @@ iniはConfigParserで処理できる。
             * 以下は「Disable Usage Collection」で問題ない気はする  
             ![](img/README/20220924-20411184.png)
     * 古いバージョンはこちら  https://developer.nvidia.com/cuda-toolkit-archive
-
+    * さらにcuDNNも必要
+        * この辺詳しい
+            * https://shift101.hatenablog.com/entry/2022/02/27/200953
+    * pytorchはCUDA Toolkit, cuDNNのバージョンに対応したものを入れる必要がある
+        * https://qiita.com/motoyuki1963/items/a334c9488c2f55a867cf
 ## AnacondaやめてMinicondaにしてみる
 
 機械学習前提＆Jupityer Notebook使える状態にしておきたい＆pip使いたいことがある、ってときcondaとpipの混在が微妙っぽいので、以下を参考にAnacondaをアンインストールしてMinicondaを入れ直す。
@@ -701,12 +751,88 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
     * `ctrl + k -> ctrl + i` の方がシグニチャ情報などが見やすいしたぶん全部見れてる
     * `ctrl + space` は本家Visual Studioと同じ
 
+## wandb
+
+* はじめかた
+    * https://qiita.com/daikiclimate/items/96bd784170582651651b
+    * https://www.nogawanogawa.com/entry/wandb
+    * アカウント作ったら、 personal の設定になっていることはとりあえず確認しておく
+* とりあえず "sandbox" って名前でプロジェクト名作ってみる
+    * Quick Setup for "sandbox" ってページができて、そこでPyTorch, Keras, XGBoost, Scikit-learnなどのサンプルがすぐに見れる！
+    * セットアップ＠コンソール
+        * https://docs.wandb.ai/quickstart
+            * pip install wandb
+            * wandb login
+                * ここでAPIキーを紐づける（同じPCなら初回だけで良いっぽい？）
+                * どこに保存されているのかはよくわからない
+                    * まずそうなときようの備忘
+                        * 環境変数に登録するやり方が楽そう
+                        * https://itnews.org/news_contents/secrets-api-management
+                        * https://shikaku-sh.hatenablog.com/entry/securing-an-api-key
+* lightGBMのサンプル
+    * https://colab.research.google.com/drive/1R6_vcVM90Ephyu0HDFlPAZa0SgEC_3bE#scrollTo=wmBJfKH0Fzwn
+    * https://www.guruguru.science/competitions/16/discussions/2b8ed6e9-d754-4ae5-a246-addb11558d9b/
+
+## フォルダ構成
+
+* https://upura.hatenablog.com/entry/2018/12/28/225234
+    * https://github.com/upura/ml-competition-template-titanic
+* cookiecutter
+    * https://www.st-hakky-blog.com/entry/2017/03/24/140738
+    * https://qiita.com/Hironsan/items/4479bdb13458249347a1
+    * https://wonderwall.hatenablog.com/entry/2017/09/07/211000
+* 仮案
+    * /
+        * data
+            * input
+                * train.csv
+                * test.csv
+                * featured.pkl ... train/testを縦に連結し特徴量エンジニアリングを実施したあとのシリアライズデータ
+            * description.csv ... 各項目の説明書
+        * notebooks
+            * eda.py ... markdown混ざりのpythonファイル
+            * profiling_report
+                * foo.html
+        * tests : https://qiita.com/hoto17296/items/fa0166728177e676cd36
+        * wandb ... このフォルダもGitHub管理対象にする
+            * model_rf.pkl
+            * model_xgb.pkl
+            * submit_rf.csv
+            * submit_xgb.csv
+            * trace_yyyymmddhhmmss.log
+            * requirments.txt
+            * ...
+        * src
+            * common
+                * utils.py
+            * 00_init.py ... 仮押さえ（想定用途は今のところなし）
+            * 10_eda.py ... eda関連 / profiling_reportやったりなどを想定
+            * 20_build_features.py ... データクリーニング・特徴量エンジニアリングを行い、MAXのデータセットを作成する
+            * 50_run_rf.py ... 必要な特徴量を取捨選択し学習、予測(valid)、submit、submit後スコア取得
+            * 50_run_xgb.py ... 同上
+        * LICENSE
+        * README.md
+
+        * ...
+
+## コード行数カウント / ステップカウント
+
+* `(dir -include *.py -recurse | select-string .).Count`
+
 ## あとで詳細読んでおきたいメモ
 
+* Tips
+    * https://naotaka1128.hatenadiary.jp/entry/kaggle-compe-tips
 * Kaggleで書いたコードの備忘録
     * https://qiita.com/pocokhc/items/add4948aa0ff858218f8
     * https://qiita.com/pocokhc/items/0b6b6534ab984bb87ac4
     * https://qiita.com/pocokhc/items/56273f40f57679f25341
+* 機械学習帳
+    * https://chokkan.github.io/mlnote/index.html
+* Chainer チュートリアル
+    * https://tutorials.chainer.org/ja/tutorial.html
+* ディープラーニング入門
+    * https://qiita.com/AeyeScan/items/301b724d11433eebc205
 
 ## 書籍
 
@@ -726,3 +852,10 @@ Pythonの仮想環境構築用の機能は複数あるみたいだが、condaで
 * あとで読み直す
     * Pythonで動かして学ぶ！ あたらしい機械学習の教科書 第2版
 
+## エラーメッセージ類
+
+### UserWarning: X has feature names, but XXXXXXXX was fitted without feature names
+
+Fit()時と型が違う警告。型をあわせれば良い。
+
+https://qiita.com/ex-soccer-coach/items/5d05cf687f2a20866afa
